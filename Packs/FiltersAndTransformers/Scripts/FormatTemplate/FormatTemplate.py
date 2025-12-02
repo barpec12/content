@@ -1,8 +1,11 @@
+register_module_line('FormatTemplate', 'start', __line__())
+CONSTANT_PACK_VERSION = '1.4.4'
+demisto.debug('pack id = FiltersAndTransformers, pack version = 1.4.4')
 from collections.abc import Callable
 from typing import Any
 
-import demistomock as demisto  # noqa: F401
-from CommonServerPython import *  # noqa: F401
+
+
 
 
 class ContextData:
@@ -180,6 +183,14 @@ def main():
         if dx and isinstance(dx, str):
             dx = json.loads(dx)
 
+        inc = args.get("ctx_inc")
+        if inc and isinstance(inc, str):
+            inc = json.loads(inc)
+
+        inputs = args.get("ctx_inputs")
+        if inputs and isinstance(inputs, str):
+            inputs = json.loads(inputs)
+
         if not template:
             template = value
             value = None
@@ -188,7 +199,7 @@ def main():
         elif template_type != "raw":
             raise DemistoException(f"Invalid template type: {template_type}")
 
-        dx = ContextData(context=dx, inputs=args.get("ctx_inputs"), incident=args.get("ctx_inc"), value=value)
+        dx = ContextData(context=dx, inputs=inputs, incident=inc, value=value)
 
         formatter = Formatter(variable_markers[0], variable_markers[1], argToBoolean(args.get("keep_symbol_to_null", False)))
         output = formatter.build(template, extract_dt, dx)
@@ -202,3 +213,5 @@ def main():
 
 if __name__ in ("__builtin__", "builtins", "__main__"):
     main()
+
+register_module_line('FormatTemplate', 'end', __line__())
